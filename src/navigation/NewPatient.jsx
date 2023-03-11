@@ -5,6 +5,8 @@ import { login, logout } from '../redux/reducer/UserReducer';
 import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
+import {FuncRegisterPatient, FuncCreateUser} from '../functions/Users';
+import {GenerateAgeSelect, GetTagWording} from '../functions/CommonFunc';
 
 const { Title, Text } = Typography;
 
@@ -36,137 +38,7 @@ function NewPatient() {
             Tag: 'Red'
         }
         setProfile(profile_test);
-        setUpdateProfile({ ...profile_test });
-
-        var test_doctor_list = [
-            {
-                ID: 'test_id_6',
-                Name: 'Doctor Name Test',
-                Profession: 'Test Profession'
-            },
-            {
-                ID: 'test_id_5',
-                Name: 'Doctor Name Test',
-                Profession: 'Test Profession'
-            },
-            {
-                ID: 'test_id_4',
-                Name: 'Doctor Name Test',
-                Profession: 'Test Profession'
-            },
-            {
-                ID: 'test_id_3',
-                Name: 'Doctor Name Test',
-                Profession: 'Test Profession'
-            },
-            {
-                ID: 'test_id_2',
-                Name: 'Doctor Name Test',
-                Profession: 'Test Profession'
-            },
-            {
-                ID: 'test_id_1',
-                Name: 'Doctor Name Test',
-                Profession: 'Test Profession'
-            }
-        ];
-        setDoctorList(test_doctor_list);
-
-        var test_appointment_list = [
-            {
-                id: 'fnodfbodbv',
-                date: '2022-05-02',
-                time: '15:21:21',
-                status: 'Booked',
-                doctor_in_charge: 'Doctor Testing',
-                remark: 'tes remark',
-                CreateDate: '2022'
-            },
-            {
-                id: 'fnodfbodbv',
-                date: '2022-05-02',
-                time: '15:21:21',
-                status: 'Booked',
-                doctor_in_charge: 'Doctor Testing',
-                remark: 'tes remark'
-            },
-            {
-                id: 'fnodfbodbv',
-                date: '2022-05-02',
-                time: '15:21:21',
-                status: 'Booked',
-                doctor_in_charge: 'Doctor Testing',
-                remark: 'tes remark'
-            },
-            {
-                id: 'fnodfbodbv',
-                date: '2022-05-02',
-                time: '15:21:21',
-                status: 'Booked',
-                doctor_in_charge: 'Doctor Testing',
-                remark: 'tes remark'
-            },
-            {
-                id: 'fnodfbodbv',
-                date: '2022-05-02',
-                time: '15:21:21',
-                status: 'Booked',
-                doctor_in_charge: 'Doctor Testing',
-                remark: 'tes remark'
-            },
-            {
-                id: 'fnodfbodbv',
-                date: '2022-05-02',
-                time: '15:21:21',
-                status: 'Booked',
-                doctor_in_charge: 'Doctor Testing',
-                remark: 'tes remark'
-            }
-        ];
-        setAppointmentList(test_appointment_list);
-        var test_medicine_list = [
-            {
-                name: 'TestMedicine',
-                dose: '500mg',
-                value: 'Test Medicine 500mg'
-            },
-            {
-                name: 'TestMedicine2',
-                dose: '100mg',
-                value: 'Test Medicine 2 100mg'
-            }
-        ];
-        setMedicineList(test_medicine_list);
     }, []);
-
-    const GetAppointmentList = () => {
-        var list = [];
-        AppointmentList.map(x => {
-            list.push({
-                label: x.date + " " + x.time,
-                children: <Text>{'Appointment ' + x.status + " with " + x.doctor_in_charge}</Text>,
-            })
-        });
-        return list;
-    }
-
-    const GetTagWording = (tag_color) => {
-        switch (tag_color) {
-            case 'Red':
-                return 'Extreme'
-            case 'Blue':
-                return 'Normal'
-            case 'Green':
-                return 'Recovered'
-            default:
-                return ''
-        }
-    }
-
-    const UpdateDetail = () => {
-        console.log(Profile);
-        setProfile({ ...UpdateProfile });
-    }
 
     const UpdateSpecificColumn = (column, value) => {
         Profile[column] = value;
@@ -178,47 +50,62 @@ function NewPatient() {
         setNewAppVal({ ...NewAppVal });
     }
 
-    const MakeNewApp = () => {
-        console.log("Make New Appointment")
+    const SubmitNewPatient=()=>{
+        console.log(Profile);
+        FuncCreateUser(Profile.UserName , Profile.Password, Profile.ConfirmPassword, Profile.Email).then((resp)=>{
+            if(resp.success && resp.userId){
+                FuncRegisterPatient(resp.userId , Profile.FirstName , Profile.LastName,
+                     Profile.NRIC, Profile.Address, Profile.ContactNum, Profile.Tag, Profile.Age).then((resp)=>{
+                        window.alert("Patient Created");
+                     });
+            }
+        }).catch((exp)=>{
+            console.warn(exp);
+        })
     }
-
-    const GetDoctorListSelection = () => {
-        var list = [];
-        DoctorList.forEach(x => list.push({ value: x.ID, label: x.Name }));
-        return list;
-    }
-
-    const onDateChange = (date, dateString) => {
-        NewAppVal.AppDate = dateString;
-        setNewAppVal({ ...NewAppVal });
-    };
-
-    const onTimeChange = (time, timeString) => {
-        NewAppVal.AppTime = timeString;
-        setNewAppVal({ ...NewAppVal });
-    };
-
     return (
         <div>
             <Title level={3}>{Profile?.FirstName + " " + Profile?.LastName}</Title>
             <Divider></Divider>
             <Row>
                 <Col xs={24} xl={12} sm={24} style={{ border: '1px solid grey', alignContent: 'center', padding: 10 }}>
-                    <Descriptions title="Profile" extra={<Button type="primary">Save</Button>}>
+                    <Descriptions title="Login Profile">
                         <Descriptions.Item label="UserName" span={3}>
                             <Input value={Profile?.UserName} onChange={(val) => { UpdateSpecificColumn("UserName", val.target.value) }} />
                         </Descriptions.Item>
+                        <Descriptions.Item label="Password" span={3}>
+                            <Input.Password value={Profile?.Password} onChange={(val) => { UpdateSpecificColumn("Password", val.target.value) }} />
+                        </Descriptions.Item>
+                        <Descriptions.Item label="Confirm Password" span={3}>
+                            <Input.Password value={Profile?.ConfirmPassword} onChange={(val) => { UpdateSpecificColumn("ConfirmPassword", val.target.value) }} />
+                        </Descriptions.Item>
+                        <Descriptions.Item label="Email" span={3}>
+                            <Input value={Profile?.Email} onChange={(val) => { UpdateSpecificColumn("Email", val.target.value) }} />
+                        </Descriptions.Item>
+                    </Descriptions>
+                </Col>
+                <Col xs={24} xl={12} sm={24} style={{ border: '1px solid grey', alignContent: 'center', padding: 10 }}>
+                    <Descriptions title="Profile" extra={<Button type="primary" onClick={SubmitNewPatient}>Save</Button>}>
                         <Descriptions.Item label="First Name" span={3}>
                             <Input value={Profile?.FirstName} onChange={(val) => { UpdateSpecificColumn("FirstName", val.target.value) }} />
                         </Descriptions.Item>
                         <Descriptions.Item label="Last Name" span={3}>
                             <Input value={Profile?.LastName} onChange={(val) => { UpdateSpecificColumn("LastName", val.target.value) }} />
                         </Descriptions.Item>
+                        <Descriptions.Item label="NRIC" span={3}>
+                            <Input value={Profile?.NRIC} onChange={(val) => { UpdateSpecificColumn("NRIC", val.target.value) }} />
+                        </Descriptions.Item>
+                        <Descriptions.Item label="Age" span={3}>
+                            <Select
+                                onChange={(val) => { UpdateSpecificColumn("Age", val) }}
+                                options={GenerateAgeSelect()}
+                                value={Profile?.Age}
+                                style={{width : 100}}
+                                defaultValue={10}
+                            />
+                        </Descriptions.Item>
                         <Descriptions.Item label="Contact" span={3}>
                             <Input value={Profile?.ContactNum} onChange={(val) => { UpdateSpecificColumn("ContactNum", val.target.value) }} />
-                        </Descriptions.Item>
-                        <Descriptions.Item label="Remark" span={3}>
-                            <Input value={Profile?.Remark} onChange={(val) => { UpdateSpecificColumn("Remark", val.target.value) }} />
                         </Descriptions.Item>
                         <Descriptions.Item label="Tag" span={3}>
                             <Select
@@ -237,42 +124,7 @@ function NewPatient() {
                         </Descriptions.Item>
                     </Descriptions>
                 </Col>
-                <Col xs={24} xl={12} sm={24} style={{ border: '1px solid grey', alignContent: 'center', padding: 10 }}>
-                    <Descriptions title="Histories" extra={<Button type="primary" onClick={() => { setNewAppModal(true) }}>New Appointment</Button>}></Descriptions>
-                    <Timeline style={{ textAlign: 'start', alignSelf: 'center' }} mode={"left"}
-                        items={GetAppointmentList()}
-                    />
-                </Col>
             </Row>
-            <Modal
-                title="New Appointment"
-                open={NewAppointmentModal}
-                onOk={MakeNewApp}
-                onCancel={() => { setNewAppModal(false) }}
-                okText="Book"
-                cancelText="Cancel"
-            >
-                <Descriptions>
-                    <Descriptions.Item label="Date" span={3}>
-                        <DatePicker onChange={onDateChange} />
-                    </Descriptions.Item>
-                    <Descriptions.Item label="Time" span={3}>
-                        <TimePicker onChange={onTimeChange} defaultValue={dayjs('00:00:00', 'HH:mm:ss')} />
-
-                    </Descriptions.Item>
-                    <Descriptions.Item label="Doctor" span={3}>
-                        <Select
-                            style={{ minWidth: 150 }}
-                            onChange={(val) => { UpdateNewAppVar("DoctorID", val) }}
-                            options={GetDoctorListSelection()}
-                            value={NewAppVal?.DoctorID}
-                        />
-                    </Descriptions.Item>
-                    <Descriptions.Item label="Remark" span={3}>
-                        <Input.TextArea value={NewAppVal?.Remark} onChange={(val) => { UpdateNewAppVar("Remark", val.target.value) }} />
-                    </Descriptions.Item>
-                </Descriptions>
-            </Modal>
         </div>
     )
 }

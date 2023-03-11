@@ -2,35 +2,57 @@ import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from 'react-redux';
 import { Button, Checkbox, Form, Input, Typography, Divider, Timeline, Row, Col, Descriptions, Select, Space, Table, Tag } from 'antd';
 import { useNavigate } from "react-router-dom";
+import { FuncGetPatient } from '../functions/Users';
+import {GetTagWording} from '../functions/CommonFunc';
 
 const { Title, Text } = Typography;
 const { Option } = Select;
 function PatientList() {
     let navigate = useNavigate();
     const [value, setValue] = useState('');
-    const [type , setType] = useState('name');
+    const [type, setType] = useState('name');
+    const [PatientList, setPatientList] = useState([]);
 
     const onCurrencyChange = (newType) => {
-        console.log(newType);
         setType(newType);
     };
 
-    const Search=()=>{
-        if(value == ''){
+    const Search = () => {
+        if (value == '') {
             window.alert("Value Required for Search");
             return;
         }
-        console.log("Search => " + value + "  " + type);
+        FuncGetPatient(value, type).then((resp) => {
+            (resp.patientList).forEach(element => {
+                element.key = element.id
+            });
+            setPatientList(resp.patientList);
+        }).catch((exp) => {
+            console.warn(exp);
+        })
+
     }
-    const GoToDetail=(patient_id)=>{
-        navigate('/PatientDetails', { state: { id: patient_id} });
+    const GoToDetail = (patient_id) => {
+        navigate('/PatientDetails', { state: { id: patient_id } });
     }
+
     const columns = [
         {
-            title: 'Name',
-            dataIndex: 'name',
-            key: 'name',
+            title: 'First Name',
+            dataIndex: 'firstName',
+            key: 'firstName',
             render: (text) => <a>{text}</a>,
+        },
+        {
+            title: 'Last Name',
+            dataIndex: 'lastName',
+            key: 'lastName',
+            render: (text) => <a>{text}</a>,
+        },
+        {
+            title: 'NRIC',
+            dataIndex: 'nric',
+            key: 'nric',
         },
         {
             title: 'Age',
@@ -43,23 +65,13 @@ function PatientList() {
             key: 'address',
         },
         {
-            title: 'Tags',
-            key: 'tags',
-            dataIndex: 'tags',
-            render: (_, { tags }) => (
-                <>
-                    {tags.map((tag) => {
-                        let color = tag.length > 5 ? 'geekblue' : 'green';
-                        if (tag === 'loser') {
-                            color = 'volcano';
-                        }
-                        return (
-                            <Tag color={color} key={tag}>
-                                {tag.toUpperCase()}
-                            </Tag>
-                        );
-                    })}
-                </>
+            title: 'Tag',
+            key: 'tag',
+            dataIndex: 'tag',
+            render: (tag) => (
+                <Tag color={tag} key={tag}>
+                    {GetTagWording(tag)}
+                </Tag>
             ),
         },
         {
@@ -67,7 +79,7 @@ function PatientList() {
             key: 'action',
             render: (_, record) => (
                 <Space size="middle">
-                    <a onClick={()=>{GoToDetail(record.Id)}}>View Detail</a>
+                    <a onClick={() => { GoToDetail(record.id) }}>View Detail</a>
                 </Space>
             ),
         },
@@ -80,7 +92,7 @@ function PatientList() {
             age: 32,
             address: 'New York No. 1 Lake Park',
             tags: ['nice', 'developer'],
-            Id : '123'
+            Id: '123'
         },
         {
             key: '2',
@@ -88,7 +100,7 @@ function PatientList() {
             age: 42,
             address: 'London No. 1 Lake Park',
             tags: ['loser'],
-            Id : '123'
+            Id: '123'
         },
         {
             key: '3',
@@ -96,7 +108,7 @@ function PatientList() {
             age: 32,
             address: 'Sydney No. 1 Lake Park',
             tags: ['cool', 'teacher'],
-            Id : '123'
+            Id: '123'
         },
     ];
     return (
@@ -110,7 +122,7 @@ function PatientList() {
                     style={{
                         width: '40%',
                     }}
-                    onChange={(val)=>{setValue(val.target.value)}}
+                    onChange={(val) => { setValue(val.target.value) }}
                 />
                 <Select
                     value={type}
@@ -124,9 +136,12 @@ function PatientList() {
                 </Select>
                 <Button type="primary" onClick={Search}>Search</Button>
             </div>
-            <div style={{ width: '100%', marginTop:'5%' }}>
-                <Table columns={columns} dataSource={data} />
-            </div>
+            {PatientList.length > 0 &&
+                <div style={{ width: '100%', marginTop: '5%' }}>
+                    <Table columns={columns} dataSource={PatientList} />
+                </div>
+            }
+
         </div>
     )
 }

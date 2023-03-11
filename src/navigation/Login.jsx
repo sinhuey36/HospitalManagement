@@ -22,8 +22,28 @@ function Login() {
                 UserId : resp.user.userId
             }
             dispatch(login(loginInfo));
-        }).then(()=>{
-            navigate('/PatientDetails');
+            return {
+                role : resp.user.role ,
+                id : resp.user.id
+            }
+        }).then((val)=>{
+            console.log(val);
+            if(val.role == "Doctor"){
+                navigate('/DoctorProfile', { state: { id: val.id } });
+                return ;
+            }
+            if(val.role == "Patient"){
+                navigate('/PatientDetails', { state: { id: val.id } });
+                return ;
+            }
+            if(val.role == "Pharmacist"){
+                navigate('/PharmacistList');
+                return ;
+            }
+            if(val.role == "Admin"){
+                navigate('/Home');
+                return;
+            }
         }).catch((exp)=>{
             console.warn(exp);
         });

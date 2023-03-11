@@ -19,11 +19,14 @@ export const FuncGetUser=()=>{
 }
 
 
-export const FuncGetPatient=(name = "")=>{
-    const Url = BaseUrl + "Users/GetPatient";
-    if(name != ""){
-        Url += "?name=" + name
+export const FuncGetPatient=(value = "" , type = "name")=>{
+    let Url = BaseUrl + "Users/GetPatient";
+
+    if(value != ""){
+        Url += "?";
+        Url += (type +"=" + value)
     }
+    
     return new Promise((resolve, reject)=>{
         fetch(Url).then((resp)=>{
             return resp.json();
@@ -41,13 +44,46 @@ export const FuncGetPatient=(name = "")=>{
 }
 
 
-export const FuncGetDoctor=(name = "")=>{
-    const Url = BaseUrl + "Users/GetDoctor";
+export const FuncGetDoctor=(name = "", id="")=>{
+    let Url = BaseUrl + "Users/GetDoctor";
     if(name != ""){
         Url += "?name=" + name
     }
+    if(name != "" && id != ""){
+        Url += "&id=" + id;
+    }
+    if(name == "" && id != ""){
+        Url += "?id=" + id;
+    }
     return new Promise((resolve, reject)=>{
         fetch(Url).then((resp)=>{
+            return resp.json();
+        }).then((resp)=>{
+            if(resp.success){
+                resolve(resp);
+            }else{
+                window.alert(resp.message);
+                reject(resp);
+            }
+        }).catch((exp)=>{
+            reject(exp);
+        })
+    })
+}
+
+export const FuncUpdatePatient=(patient)=>{
+    const Url = BaseUrl + "Users/UpdatePatient";
+    return new Promise((resolve, reject)=>{
+        fetch(Url , {
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            method: "POST",
+            body: JSON.stringify(
+                patient
+            )
+        }).then((resp)=>{
             return resp.json();
         }).then((resp)=>{
             if(resp.success){
@@ -116,7 +152,7 @@ export const FuncCreateUser=(username, password, confirmPassword, Email)=>{
 }
 
 
-export const FuncRegisterPatient=(userId, firstName, lastName, nric, address, contactnum, tag)=>{
+export const FuncRegisterPatient=(userId, firstName, lastName, nric, address, contactnum, tag, age)=>{
     const Url = BaseUrl + "Users/RegisterPatient";
     return new Promise((resolve, reject)=>{
         fetch(Url , {
@@ -133,6 +169,7 @@ export const FuncRegisterPatient=(userId, firstName, lastName, nric, address, co
                     NRIC : nric,
                     Address : address,
                     ContactNum : contactnum,
+                    Age : age,
                     Tag : tag
                 }
             )

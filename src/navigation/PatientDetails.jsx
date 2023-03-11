@@ -5,6 +5,11 @@ import { login, logout } from '../redux/reducer/UserReducer';
 import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
+import { GetTagWording, GenerateAgeSelect } from '../functions/CommonFunc';
+import { FuncGetPatient, FuncUpdatePatient, FuncGetDoctor } from '../functions/Users';
+import { FuncGetAppointmentList, FuncNewAppointment } from '../functions/Appointment';
+import { FuncGetMedicines, FuncAddNewPrescription } from '../functions/Prescription';
+
 
 const { Title, Text } = Typography;
 
@@ -32,9 +37,8 @@ const tagRender = (props) => {
 function PatientDetails() {
     const { state } = useLocation();
     const [Profile, setProfile] = useState({});
-    const [UpdateProfile, setUpdateProfile] = useState([]);
+    const [UpdateProfile, setUpdateProfile] = useState({});
     const [ShowModal, setShowModal] = useState(false);
-    const [ShowUpdateAppModal, setShowUpdateAppModal] = useState(false);
     const [NewAppointmentModal, setNewAppModal] = useState(false);
     const [DoctorList, setDoctorList] = useState([]);
     const [AppointmentList, setAppointmentList] = useState([]);
@@ -45,124 +49,69 @@ function PatientDetails() {
         DoctorID: '',
         Remark: ''
     });
+    const [NewPrescriptionModal, setNewPrescriptionModal] = useState(false);
+    const [PrescriptionDetail, setPrescriptionDetail] = useState({});
 
     const [SelectedAppointment, setSelectedAppointment] = useState(null);
     useEffect(() => {
-        //get id from state 
-        // var patient_id = state.id;
-        var profile_test = {
-            Id: 'test id ',
-            UserName: 'Test Name',
-            FirstName: 'First Name',
-            LastName: 'Last Name',
-            Remark: 'Remark',
-            Address: 'Temp address',
-            ContactNum: '0123456789',
-            Tag: 'Red'
-        }
-        setProfile(profile_test);
-        setUpdateProfile({ ...profile_test });
-
-        var test_doctor_list = [
-            {
-                ID: 'test_id_6',
-                Name: 'Doctor Name Test',
-                Profession: 'Test Profession'
-            },
-            {
-                ID: 'test_id_5',
-                Name: 'Doctor Name Test',
-                Profession: 'Test Profession'
-            },
-            {
-                ID: 'test_id_4',
-                Name: 'Doctor Name Test',
-                Profession: 'Test Profession'
-            },
-            {
-                ID: 'test_id_3',
-                Name: 'Doctor Name Test',
-                Profession: 'Test Profession'
-            },
-            {
-                ID: 'test_id_2',
-                Name: 'Doctor Name Test',
-                Profession: 'Test Profession'
-            },
-            {
-                ID: 'test_id_1',
-                Name: 'Doctor Name Test',
-                Profession: 'Test Profession'
-            }
-        ];
-        setDoctorList(test_doctor_list);
-
-        var test_appointment_list = [
-            {
-                id: 'fnodfbodbv',
-                date: '2022-05-02',
-                time: '15:21:21',
-                status: 'Booked',
-                doctor_in_charge: 'Doctor Testing',
-                remark: 'tes remark',
-                CreateDate: '2022'
-            },
-            {
-                id: 'fnodfbodbv',
-                date: '2022-05-02',
-                time: '15:21:21',
-                status: 'Booked',
-                doctor_in_charge: 'Doctor Testing',
-                remark: 'tes remark'
-            },
-            {
-                id: 'fnodfbodbv',
-                date: '2022-05-02',
-                time: '15:21:21',
-                status: 'Booked',
-                doctor_in_charge: 'Doctor Testing',
-                remark: 'tes remark'
-            },
-            {
-                id: 'fnodfbodbv',
-                date: '2022-05-02',
-                time: '15:21:21',
-                status: 'Booked',
-                doctor_in_charge: 'Doctor Testing',
-                remark: 'tes remark'
-            },
-            {
-                id: 'fnodfbodbv',
-                date: '2022-05-02',
-                time: '15:21:21',
-                status: 'Booked',
-                doctor_in_charge: 'Doctor Testing',
-                remark: 'tes remark'
-            },
-            {
-                id: 'fnodfbodbv',
-                date: '2022-05-02',
-                time: '15:21:21',
-                status: 'Booked',
-                doctor_in_charge: 'Doctor Testing',
-                remark: 'tes remark'
-            }
-        ];
-        setAppointmentList(test_appointment_list);
-        var test_medicine_list = [
-            {
-                name: 'TestMedicine',
-                dose: '500mg',
-                value: 'Test Medicine 500mg'
-            },
-            {
-                name: 'TestMedicine2',
-                dose: '100mg',
-                value: 'Test Medicine 2 100mg'
-            }
-        ];
-        setMedicineList(test_medicine_list);
+        //id
+        GetPatientDetails(state.id);
+        GetAppointmentDetails(state.id);
+        GetDoctor();
+        GetMedicines();
     }, []);
+
+    const GetMedicines=()=>{
+        FuncGetMedicines().then((resp)=>{
+            console.log(resp);
+            var list = [];
+            resp.list.forEach(med => list.push({
+                name: med.name + "(" + med.dose + "mg)",
+                dose: med.dose,
+                value : med.id,
+                label: med.name + "(" + med.dose + "mg)"
+            }));
+            setMedicineList([...list]);
+        })
+    }
+
+    const GetAppointmentDetails = (id) => {
+        FuncGetAppointmentList(id, "", "", "").then((resp) => {
+            console.log(resp.appointmentList);
+            setAppointmentList([...resp.appointmentList]);
+        }).catch((exp) => {
+            console.warn(exp);
+        });
+    }
+
+    const GetDoctor = () => {
+        FuncGetDoctor().then((resp) => {
+            setDoctorList([...resp.doctorList]);
+        }).catch((exp) => {
+            console.warn(exp);
+        })
+    }
+    const GetPatientDetails = (id) => {
+        FuncGetPatient(id, 'id').then((resp) => {
+            if (resp.patientList.length != 1) {
+                window.alert("User Not Found");
+            } else {
+                var patient = resp.patientList[0];
+                const profile = {
+                    Id: patient.id,
+                    FirstName: patient.firstName,
+                    LastName: patient.lastName,
+                    Age: patient.age,
+                    Address: patient.address,
+                    ContactNum: patient.contactNum,
+                    Tag: patient.tag,
+                    Nric: patient.nric
+                }
+                setProfile({ ...profile });
+                setUpdateProfile({ ...profile });
+            }
+        })
+    }
 
     const ViewAppointment = (appointment_id) => {
         setSelectedAppointment(AppointmentList.find(x => x.id === appointment_id));
@@ -171,30 +120,25 @@ function PatientDetails() {
     const GetAppointmentList = () => {
         var list = [];
         AppointmentList.map(x => {
+            let d = x.appointmentDateTime.replace("T", " ");
             list.push({
-                label: x.date + " " + x.time,
-                children: <Text onClick={() => { ViewAppointment(x.id) }}>{'Appointment ' + x.status + " with " + x.doctor_in_charge}</Text>,
+                label: d,
+                children: <Text onClick={() => { ViewAppointment(x.id) }}>{'Appointment ' + x.status + " with doctor" + x.doctor?.firstName + " " + x.doctor?.lastName}</Text>,
             })
         });
         return list;
     }
 
-    const GetTagWording = (tag_color) => {
-        switch (tag_color) {
-            case 'Red':
-                return 'Extreme'
-            case 'Blue':
-                return 'Normal'
-            case 'Green':
-                return 'Recovered'
-            default:
-                return ''
-        }
-    }
-
     const UpdateDetail = () => {
-        console.log(Profile);
-        setProfile({ ...UpdateProfile });
+        FuncUpdatePatient(UpdateProfile).then((resp) => {
+            window.alert(resp.message);
+            if (resp.success) {
+                GetPatientDetails(UpdateProfile.Id);
+                setShowModal(false);
+            }
+        }).catch((exp) => {
+            console.warn(exp);
+        })
     }
 
     const UpdateSpecificColumn = (column, value) => {
@@ -208,12 +152,19 @@ function PatientDetails() {
     }
 
     const MakeNewApp = () => {
-        console.log("Make New Appointment")
+        var dateTimeReformatting = NewAppVal.AppDate + "T" + NewAppVal.AppTime;
+        FuncNewAppointment(dateTimeReformatting, true, Profile.Id, NewAppVal.DoctorID, NewAppVal.Remark).then((resp) => {
+            window.alert(resp.message);
+            GetAppointmentDetails(Profile.Id);
+            setNewAppModal(false);
+        }).catch((exp) => {
+            console.warn(exp);
+        })
     }
 
     const GetDoctorListSelection = () => {
         var list = [];
-        DoctorList.forEach(x => list.push({ value: x.ID, label: x.Name }));
+        DoctorList.forEach(x => list.push({ value: x.id, label: x.firstName + " " + x.lastName }));
         return list;
     }
 
@@ -236,18 +187,35 @@ function PatientDetails() {
         SelectedAppointment.remark = newRemark;
         setSelectedAppointment({ ...SelectedAppointment });
     }
+    const UpdatePrescriptionRemark = (val) => {
+        PrescriptionDetail.Remark = val;
+        setPrescriptionDetail({ ...PrescriptionDetail });
+    }
+    const UpdatePrescriptionMedicine=(val)=>{
+        PrescriptionDetail.Medicine = val;
+        setPrescriptionDetail({ ...PrescriptionDetail });
+    }
+    const SubmitNewPrescription = () => {
+         FuncAddNewPrescription(Profile.Id, SelectedAppointment?.doctor?.id, 
+            PrescriptionDetail.Remark, SelectedAppointment.id, PrescriptionDetail.Medicine).then((resp)=>{
+            window.alert(resp.message);
+            setNewPrescriptionModal(false);
+         }).catch((exp)=>{
+            console.warn(exp);
+         })
+    }
     return (
         <div>
-            <Title level={3}>Patient Name</Title>
+            <Title level={3}>{Profile?.FirstName + " " + Profile?.LastName}</Title>
             <Divider></Divider>
             <Row>
                 <Col xs={24} xl={12} sm={24} style={{ border: '1px solid grey', alignContent: 'center', padding: 10 }}>
                     <Descriptions title="Profile" extra={<Button type="primary" onClick={() => { setShowModal(true) }}>Update</Button>}>
-                        <Descriptions.Item label="UserName">{Profile?.UserName}</Descriptions.Item>
                         <Descriptions.Item label="First Name">{Profile?.FirstName}</Descriptions.Item>
                         <Descriptions.Item label="Last Name">{Profile?.LastName}</Descriptions.Item>
                         <Descriptions.Item label="Contact">{Profile?.ContactNum}</Descriptions.Item>
-                        <Descriptions.Item label="Remark">{Profile?.Remark}</Descriptions.Item>
+                        <Descriptions.Item label="Age">{Profile?.Age}</Descriptions.Item>
+                        <Descriptions.Item label="NRIC">{Profile?.Nric}</Descriptions.Item>
                         <Descriptions.Item label="Tag">
                             {
                                 Profile?.Tag &&
@@ -255,7 +223,6 @@ function PatientDetails() {
                                     {GetTagWording(Profile?.Tag)}
                                 </Tag>
                             }
-
                         </Descriptions.Item>
                         <Descriptions.Item label="Address">
                             {Profile?.Address}
@@ -271,14 +238,13 @@ function PatientDetails() {
             </Row>
             {
                 SelectedAppointment != null &&
-
-                <Row style={{marginTop: 20}}>
-                    <Descriptions title="Appointment Details" 
-                    extra={<>
-                    <Button type="primary">Update Appointment</Button>
-                    <Button type="primary" onClick={()=>{setSelectedAppointment(null)}}>Close</Button></>}>
-                        <Descriptions.Item label="Doctor In charge">{SelectedAppointment?.doctor_in_charge}</Descriptions.Item>
-                        <Descriptions.Item label="Date Time">{SelectedAppointment?.date + " " + SelectedAppointment?.time}</Descriptions.Item>
+                <Row style={{ marginTop: 20 }}>
+                    <Descriptions title="Appointment Details"
+                        extra={<>
+                            <Button type="primary">Update Appointment Information</Button>
+                            <Button type="primary" onClick={() => { setNewPrescriptionModal(true) }}>Add Prescription</Button></>}>
+                        <Descriptions.Item label="Doctor In charge">{SelectedAppointment?.doctor?.firstName + " " + SelectedAppointment?.doctor?.lastName}</Descriptions.Item>
+                        <Descriptions.Item label="Date Time">{SelectedAppointment?.appointmentDateTime.replace("T", " ")}</Descriptions.Item>
                         <Descriptions.Item label="Status">
                             <Select
                                 style={{ minWidth: 150 }}
@@ -302,17 +268,6 @@ function PatientDetails() {
                         <Descriptions.Item label="Remark">
                             <Input.TextArea value={SelectedAppointment?.remark} onChange={(val) => { UpdateAppRemark(val.target.value) }} />
                         </Descriptions.Item>
-                        <Descriptions.Item label="Prescription">
-                            <Select
-                                mode="multiple"
-                                showArrow
-                                tagRender={tagRender}
-                                style={{
-                                    width: '100%',
-                                }}
-                                options={MedicineList}
-                            />
-                        </Descriptions.Item>
                     </Descriptions>
                 </Row>
             }
@@ -325,11 +280,18 @@ function PatientDetails() {
                 cancelText="Cancel"
             >
                 <Descriptions>
-                    <Descriptions.Item label="UserName" span={3}><Input value={UpdateProfile?.UserName} onChange={(val) => { UpdateSpecificColumn("UserName", val.target.value) }} /></Descriptions.Item>
                     <Descriptions.Item label="First Name" span={3}><Input value={UpdateProfile?.FirstName} onChange={(val) => { UpdateSpecificColumn("FirstName", val.target.value) }} /></Descriptions.Item>
                     <Descriptions.Item label="Last Name" span={3}><Input value={UpdateProfile?.LastName} onChange={(val) => { UpdateSpecificColumn("LastName", val.target.value) }} /></Descriptions.Item>
                     <Descriptions.Item label="Contact" span={3}><Input value={UpdateProfile?.ContactNum} onChange={(val) => { UpdateSpecificColumn("ContactNum", val.target.value) }} /></Descriptions.Item>
-                    <Descriptions.Item label="Remark" span={3}><Input value={UpdateProfile?.Remark} onChange={(val) => { UpdateSpecificColumn("Remark", val.target.value) }} /></Descriptions.Item>
+                    <Descriptions.Item label="NRIC" span={3}><Input value={UpdateProfile?.Nric} onChange={(val) => { UpdateSpecificColumn("Nric", val.target.value) }} /></Descriptions.Item>
+                    <Descriptions.Item label="Age" span={3}>
+                        <Select
+                            onChange={(val) => { UpdateSpecificColumn("Age", val) }}
+                            options={GenerateAgeSelect()}
+                            value={Profile?.Age}
+                            style={{ width: 100 }}
+                            defaultValue={10}
+                        /></Descriptions.Item>
                     <Descriptions.Item label="Tag" span={3}>
                         <Select
                             onChange={(val) => { UpdateSpecificColumn("Tag", val) }}
@@ -372,6 +334,32 @@ function PatientDetails() {
                     </Descriptions.Item>
                     <Descriptions.Item label="Remark" span={3}>
                         <Input.TextArea value={NewAppVal?.Remark} onChange={(val) => { UpdateNewAppVar("Remark", val.target.value) }} />
+                    </Descriptions.Item>
+                </Descriptions>
+            </Modal>
+            <Modal
+                title="New Prescription"
+                open={NewPrescriptionModal}
+                onOk={SubmitNewPrescription}
+                onCancel={() => { setNewPrescriptionModal(false) }}
+                okText="Confirm"
+                cancelText="Cancel"
+            >
+                <Descriptions>
+                    <Descriptions.Item label="Remark" span={3}>
+                        <Input.TextArea value={PrescriptionDetail?.Remark} onChange={(val) => { UpdatePrescriptionRemark(val.target.value) }} />
+                    </Descriptions.Item>
+                    <Descriptions.Item label="Medicine" span={3}>
+                        <Select
+                            mode="multiple"
+                            showArrow
+                            tagRender={tagRender}
+                            style={{
+                                width: '100%',
+                            }}
+                            onChange={UpdatePrescriptionMedicine}
+                            options={MedicineList}
+                        />
                     </Descriptions.Item>
                 </Descriptions>
             </Modal>

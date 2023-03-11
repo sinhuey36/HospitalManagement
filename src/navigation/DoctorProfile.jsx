@@ -5,6 +5,7 @@ import { useSelector, useDispatch } from 'react-redux'
 import { login, logout } from '../redux/reducer/UserReducer';
 import { UserOutlined } from '@ant-design/icons';
 import { useParams, useLocation, useNavigate } from 'react-router-dom';
+import {FuncGetDoctor} from '../functions/Users';
 
 const { Title, Text } = Typography;
 
@@ -14,7 +15,8 @@ function DoctorProfile() {
     let navigate = useNavigate();
 
     useEffect(() => {
-        console.log(state);
+        console.log(state.id);
+        GetProfile(state.id);
         //test profile data 
         var profile_test = {
             FirstName: 'First Name',
@@ -29,6 +31,21 @@ function DoctorProfile() {
         setProfile(profile_test);
     }, []);
 
+    const GetProfile=(id)=>{
+        FuncGetDoctor("", id).then((resp)=>{
+            if(resp.doctorList.length != 1){
+                window.alert("User Not found");
+                return;
+            }else{
+                const doctor = resp.doctorList[0];
+                setProfile({...doctor});
+            }
+
+            console.log(resp);
+        }).catch((exp)=>{
+            console.warn(exp);
+        })
+    }   
     const ViewAppointment=(Id)=>{
         navigate('/DoctorList', { state: { id: Id } });
     }
@@ -39,17 +56,16 @@ function DoctorProfile() {
             <div>
                 <Avatar size={80} icon={<UserOutlined />} />
             </div>
-            <Descriptions bordered style={{ marginTop: '3%' }} extra={<Button type="primary" onClick={()=>{ViewAppointment(profile.ID)}}>View Appointments</Button>}>
-                <Descriptions.Item label="First Name">{profile?.FirstName}</Descriptions.Item>
-                <Descriptions.Item label="Last Name">{profile?.LastName}</Descriptions.Item>
-                <Descriptions.Item label="Profession">{profile?.Profession}</Descriptions.Item>
+            <Descriptions bordered style={{ marginTop: '3%' }} extra={<Button type="primary" onClick={()=>{ViewAppointment(profile.id)}}>View Appointments</Button>}>
+                <Descriptions.Item label="First Name">{profile?.firstName}</Descriptions.Item>
+                <Descriptions.Item label="Last Name">{profile?.lastName}</Descriptions.Item>
+                <Descriptions.Item label="Profession">{profile?.profession}</Descriptions.Item>
                 <Descriptions.Item label="ContactNo"> 
-                <p>{profile?.ContactNo}</p>
-                <p>{profile?.OfficeNo}</p>
+                <p>{profile?.contactNum}</p>
                 </Descriptions.Item>
-                <Descriptions.Item label="Email">{profile?.Email}</Descriptions.Item>
-                <Descriptions.Item label="Email">{profile?.Email}</Descriptions.Item>
-                <Descriptions.Item label="Description" span={3}>{profile?.Description}</Descriptions.Item>
+                <Descriptions.Item label="Email">{profile?.email}</Descriptions.Item>
+                <Descriptions.Item label="Date of Join">{profile?.createDateTime?.split("T")[0]}</Descriptions.Item>
+                <Descriptions.Item label="Introduction" span={3}>{profile?.introduction}</Descriptions.Item>
             </Descriptions>
         </div>
     )

@@ -1,118 +1,43 @@
 import React, { useState, useEffect } from "react";
 import { Button, Checkbox, Form, Input, Typography, Divider, Timeline, Row, Col, Space, Card } from 'antd';
 import { CloseOutlined } from '@ant-design/icons';
+import { FuncGetPrescriptions } from '../functions/Prescription';
 const { Title, Text } = Typography;
 
 function PharmacistList() {
     const [PrescriptionList, setPrescriptionList] = useState([]);
 
     useEffect(() => {
-        var test_list = [
-            {
-                id: 'asdadefgs',
-                Medicine:[
-                    {
-                        name: 'Paracetamol',
-                        dose: '50mg'
-                    },
-                    {
-                        name: 'Med Name',
-                        dose: '100mg'
-                    }
-                ],
-                PatientName: 'TestPatientName'
-            },
-            {
-                id: 'asdadbrtb',
-                Medicine:[
-                    {
-                        name: 'Paracetamol',
-                        dose: '50mg'
-                    },
-                    {
-                        name: 'Med Name',
-                        dose: '100mg'
-                    }
-                ],
-                PatientName: 'TestPatientName'
-            },
-            {
-                id: 'asdadrtrs',
-                Medicine:[
-                    {
-                        name: 'Paracetamol',
-                        dose: '50mg'
-                    },
-                    {
-                        name: 'Med Name',
-                        dose: '100mg'
-                    }
-                ],
-                PatientName: 'TestPatientName'
-            },
-            {
-                id: 'asdadbfnt',
-                Medicine:[
-                    {
-                        name: 'Paracetamol',
-                        dose: '50mg'
-                    },
-                    {
-                        name: 'Med Name',
-                        dose: '100mg'
-                    }
-                ],
-                PatientName: 'TestPatientName'
-            },
-            {
-                id: 'asdadsfg',
-                Medicine:[
-                    {
-                        name: 'Paracetamol',
-                        dose: '50mg'
-                    },
-                    {
-                        name: 'Med Name',
-                        dose: '100mg'
-                    }
-                ],
-                PatientName: 'TestPatientName'
-            },
-            {
-                id: 'asdadbfgb',
-                Medicine:[
-                    {
-                        name: 'Paracetamol',
-                        dose: '50mg'
-                    },
-                    {
-                        name: 'Med Name',
-                        dose: '100mg'
-                    }
-                ],
-                PatientName: 'TestPatientName'
-            },
-            {
-                id: 'asdadd',
-                Medicine:[
-                    {
-                        name: 'Paracetamol',
-                        dose: '50mg'
-                    },
-                    {
-                        name: 'Med Name',
-                        dose: '100mg'
-                    }
-                ],
-                PatientName: 'TestPatientName'
-            }
-        ];
-        setPrescriptionList(test_list);
+        GetPrescriptionLists();
     }, []);
 
+    const GetPrescriptionLists=()=>{
+        FuncGetPrescriptions("", "").then((resp)=>{
+            var list = [];
+            resp.histories.forEach(hist => {
+                var Medicine_list = [];
+                hist.medicine.forEach(med => {
+                    Medicine_list.push({
+                        name : med.name,
+                        dose : med.dose.toString() + "mg"
+                    });
+                });
+
+                list.push(
+                    {
+                        id : hist.id,
+                        PatientName: hist.patient.firstName + " " + hist.patient.lastName,
+                        NRIC : hist.patient.nric,
+                        Medicine : Medicine_list
+                    }
+                );
+            });
+            setPrescriptionList(list);
+        })
+    }
     const DoseGiven = (id) => {
         console.log("Update Prescription Status");
-        PrescriptionList.splice(PrescriptionList.indexOf(x=> x.id === id) , 1);
+        PrescriptionList.splice(PrescriptionList.indexOf(x => x.id === id), 1);
         setPrescriptionList([...PrescriptionList]);
     }
 
@@ -132,9 +57,11 @@ function PharmacistList() {
                                             icon={<CloseOutlined />}
                                             onClick={() => { DoseGiven(x.id) }}
                                         />}>
+                                            <p><b>{x.NRIC}</b></p>
                                     {x.Medicine.map(med =>
                                         <p>{med.name + "( " + med.dose + ")"}</p>
                                     )}
+                                    
                                 </Card>
                             </Col>
                         )

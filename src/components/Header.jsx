@@ -41,30 +41,6 @@ function NavigationHeader(param) {
         getItem('Doctor', '/DoctorProfile', <UserOutlined />, null, null),
         getItem('Prescription List', '/PharmacistList', <UserOutlined />, null, null),
         getItem('New Patient', '/NewPatient', <UserOutlined />, null, null),
-        getItem('Admin', 'admin', <UserOutlined />, [
-            getItem('Registration', 'admin-register', null,
-                [
-                    getItem('New Patient', 'admin-register-patient'),
-                    getItem('New Doctor', 'admin-register-doctor'),
-                    getItem('New Admin', 'admin-register-admin'),
-                    getItem('New Pharmacist', 'admin-register-pharmacist')
-                ],
-                'group'),
-            getItem('Manage', 'admin-manage', null,
-                [
-                    getItem('Manage Patient', 'admin-manage-patient'),
-                    getItem('Manage Doctor', 'admin-manage-doctor'),
-                    getItem('Manage Admin', '/Admin'),
-                    getItem('Manage Pharmacist', 'admin-manage-pharmacist')
-                ],
-                'group'),
-            getItem('Prescription', 'admin-prescription', null,
-                [
-                    getItem('Add Prescription', 'admin-prescription-add'),
-                    getItem('Manage Prescription', 'admin-prescription-manage')
-                ],
-                'group')
-        ]),
         getItem('Logout', 'logout', <UserOutlined />, null, null)
     ];
 

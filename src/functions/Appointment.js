@@ -2,7 +2,7 @@ import {BaseUrl} from './Base';
 
 
 export const FuncGetAppointmentList=(PatientId = "", DoctorId = "", PatientName = "", DoctorName = "")=>{
-    const Url = BaseUrl + "Users/GetAppointmentList";
+    const Url = BaseUrl + "Appointment/GetAppointmentList";
     return new Promise((resolve, reject)=>{
         fetch(Url , {
             headers: {
@@ -36,7 +36,7 @@ export const FuncGetAppointmentList=(PatientId = "", DoctorId = "", PatientName 
 
 
 export const FuncNewAppointment=(AppointmentDateTime = "", isPatient = true, PatientId = "", DoctorId = "", Remark = "")=>{
-    const Url = BaseUrl + "Users/NewAppointment";
+    const Url = BaseUrl + "Appointment/NewAppointment";
     return new Promise((resolve, reject)=>{
         fetch(Url , {
             headers: {
