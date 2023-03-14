@@ -3,14 +3,14 @@ import { Layout, Menu, theme } from 'antd';
 import { useNavigate } from "react-router-dom";
 import { useSelector, useDispatch, useStore } from 'react-redux'
 import { login, logout, userSlice } from '../redux/reducer/UserReducer';
-import React, {useEffect} from "react";
+import React, {useEffect, useState} from "react";
 import {store} from '../redux/store';
 const { Content, Sider } = Layout;
 function NavigationHeader(param) {
     let navigate = useNavigate();
     const user = store.getState();
     const dispatch = useDispatch();
-
+    const [SideMenu , setMenu] = useState([]);
     useEffect(() => {
         //navigate to login if not found user 
         if(user.UserName == null || user.FirstName == null || user.LastName == null || user.Role == null || user.UserId == null || user.RoleId == null){
@@ -18,10 +18,42 @@ function NavigationHeader(param) {
             window.alert("Please Login to Proceed");
             Logout();
         }
+        SettingSideMenu(user.Role);
       }, []);
     const Logout=()=>{
         dispatch(logout());
         navigate('/Login');
+    }
+
+    const SettingSideMenu=(role)=>{
+        var list = [];
+        switch(role){
+            case 'Pharmacist':{
+                list.push(getItem('Search Patient', '/PatientList', <UserOutlined />, null, null));
+                list.push(getItem('Prescription List', '/PharmacistList', <UserOutlined />, null, null));
+                break;
+            }
+            case 'Doctor':{
+                list.push(getItem('Search Patient', '/PatientList', <UserOutlined />, null, null));
+                list.push(getItem('Prescription List', '/PharmacistList', <UserOutlined />, null, null));
+                list.push( getItem('Profile', '/DoctorProfile', <UserOutlined />, null, null),);
+                break;
+            }
+            case 'Patient':{
+                list.push( getItem('Profile', '/PatientDetails', <UserOutlined />, null, null));
+                list.push( getItem('Doctor List', '/Admin', <UserOutlined />, null, null));
+                break;
+            }
+            case 'Admin':{
+                list.push( getItem('Search Patient', '/PatientList', <UserOutlined />, null, null));
+                list.push( getItem('Admin', '/Admin', <UserOutlined />, null, null));
+                list.push( getItem('New Patient', '/NewPatient', <UserOutlined />, null, null));
+                break;
+            }
+            default : break;
+        }
+        list.push(getItem('Logout', 'logout', <UserOutlined />, null, null));
+        setMenu(list);
     }
     // setting menu item 
     function getItem(label, key, icon, children, type) {
@@ -33,17 +65,6 @@ function NavigationHeader(param) {
             type
         };
     }
-    //replace the key to route 
-    const items = [
-        getItem('Home', '/', <UserOutlined />, null, null),
-        getItem('Search Patient', '/PatientList', <UserOutlined />, null, null),
-        getItem('Admin', '/Admin', <UserOutlined />, null, null),
-        getItem('Doctor', '/DoctorProfile', <UserOutlined />, null, null),
-        getItem('Prescription List', '/PharmacistList', <UserOutlined />, null, null),
-        getItem('New Patient', '/NewPatient', <UserOutlined />, null, null),
-        getItem('Logout', 'logout', <UserOutlined />, null, null)
-    ];
-
     const {
         token: { colorBgContainer },
     } = theme.useToken();
@@ -51,6 +72,15 @@ function NavigationHeader(param) {
     const onClick = (item) => {
         if(item.key == 'logout'){
             Logout();
+            return;
+        }
+        if(item.key == "/PatientDetails"){
+            console.log(user.RoleId);
+            navigate(item.key ,  { state: { id: user.RoleId } })
+            return;
+        }
+        if(item.key == "/DoctorProfile"){
+            navigate(item.key ,  { state: { id: user.RoleId } })
             return;
         }
         navigate(item.key);
@@ -74,7 +104,7 @@ function NavigationHeader(param) {
                     onClick={onClick}
                     defaultSelectedKeys={['home']}
                     defaultOpenKeys={['home']}
-                    items={items}
+                    items={SideMenu}
                 />
             </Sider>
             <Layout>

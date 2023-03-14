@@ -10,9 +10,11 @@ import {GenerateAgeSelect, GetTagWording} from '../functions/CommonFunc';
 
 const { Title, Text } = Typography;
 
-function NewPatient() {
+function Register() {
     const { state } = useLocation();
-    const [Profile, setProfile] = useState({});
+    const [Profile, setProfile] = useState({
+        Tag : 'Blue'
+    });
     const [UpdateProfile, setUpdateProfile] = useState([]);
     const [NewAppointmentModal, setNewAppModal] = useState(false);
     const [DoctorList, setDoctorList] = useState([]);
@@ -25,6 +27,8 @@ function NewPatient() {
         Remark: ''
     });
     useEffect(() => {
+        //get id from state 
+        // var patient_id = state.id;
     }, []);
 
     const UpdateSpecificColumn = (column, value) => {
@@ -52,8 +56,7 @@ function NewPatient() {
     }
     return (
         <div>
-            <Title level={3}>New Patient Registration</Title>
-            
+            <Title level={3}>New User Registration</Title>
             <Divider></Divider>
             <Row>
                 <Col xs={24} xl={12} sm={24} style={{ border: '1px solid grey', alignContent: 'center', padding: 10 }}>
@@ -73,7 +76,7 @@ function NewPatient() {
                     </Descriptions>
                 </Col>
                 <Col xs={24} xl={12} sm={24} style={{ border: '1px solid grey', alignContent: 'center', padding: 10 }}>
-                    <Descriptions title="Profile" extra={<Button type="primary" onClick={SubmitNewPatient}>Save</Button>}>
+                    <Descriptions title="Profile" extra={<Button type="primary" onClick={SubmitNewPatient}>Register</Button>}>
                         <Descriptions.Item label="First Name" span={3}>
                             <Input value={Profile?.FirstName} onChange={(val) => { UpdateSpecificColumn("FirstName", val.target.value) }} />
                         </Descriptions.Item>
@@ -97,6 +100,7 @@ function NewPatient() {
                         </Descriptions.Item>
                         <Descriptions.Item label="Tag" span={3}>
                             <Select
+                            disabled
                                 onChange={(val) => { UpdateSpecificColumn("Tag", val) }}
                                 options={[
                                     { value: 'Red', label: GetTagWording('Red') },
@@ -116,4 +120,4 @@ function NewPatient() {
         </div>
     )
 }
-export default NewPatient;
+export default Register;

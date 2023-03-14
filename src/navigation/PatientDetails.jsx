@@ -7,9 +7,9 @@ import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 import { GetTagWording, GenerateAgeSelect } from '../functions/CommonFunc';
 import { FuncGetPatient, FuncUpdatePatient, FuncGetDoctor } from '../functions/Users';
-import { FuncGetAppointmentList, FuncNewAppointment } from '../functions/Appointment';
+import { FuncGetAppointmentList, FuncNewAppointment, FuncUpdateAppointment } from '../functions/Appointment';
 import { FuncGetMedicines, FuncAddNewPrescription } from '../functions/Prescription';
-
+import { store } from '../redux/store';
 
 const { Title, Text } = Typography;
 
@@ -36,6 +36,8 @@ const tagRender = (props) => {
 
 function PatientDetails() {
     const { state } = useLocation();
+    const user = store.getState();
+
     const [Profile, setProfile] = useState({});
     const [UpdateProfile, setUpdateProfile] = useState({});
     const [ShowModal, setShowModal] = useState(false);
@@ -61,14 +63,14 @@ function PatientDetails() {
         GetMedicines();
     }, []);
 
-    const GetMedicines=()=>{
-        FuncGetMedicines().then((resp)=>{
+    const GetMedicines = () => {
+        FuncGetMedicines().then((resp) => {
             console.log(resp);
             var list = [];
             resp.list.forEach(med => list.push({
                 name: med.name + "(" + med.dose + "mg)",
                 dose: med.dose,
-                value : med.id,
+                value: med.id,
                 label: med.name + "(" + med.dose + "mg)"
             }));
             setMedicineList([...list]);
@@ -91,6 +93,7 @@ function PatientDetails() {
             console.warn(exp);
         })
     }
+
     const GetPatientDetails = (id) => {
         FuncGetPatient(id, 'id').then((resp) => {
             if (resp.patientList.length != 1) {
@@ -191,18 +194,45 @@ function PatientDetails() {
         PrescriptionDetail.Remark = val;
         setPrescriptionDetail({ ...PrescriptionDetail });
     }
-    const UpdatePrescriptionMedicine=(val)=>{
+    const UpdatePrescriptionMedicine = (val) => {
         PrescriptionDetail.Medicine = val;
         setPrescriptionDetail({ ...PrescriptionDetail });
     }
     const SubmitNewPrescription = () => {
-         FuncAddNewPrescription(Profile.Id, SelectedAppointment?.doctor?.id, 
-            PrescriptionDetail.Remark, SelectedAppointment.id, PrescriptionDetail.Medicine).then((resp)=>{
-            window.alert(resp.message);
-            setNewPrescriptionModal(false);
-         }).catch((exp)=>{
-            console.warn(exp);
-         })
+        FuncAddNewPrescription(Profile.Id, SelectedAppointment?.doctor?.id,
+            PrescriptionDetail.Remark, SelectedAppointment.id, PrescriptionDetail.Medicine).then((resp) => {
+                window.alert(resp.message);
+                setNewPrescriptionModal(false);
+            }).catch((exp) => {
+                console.warn(exp);
+            })
+    }
+    const UpdateAppointmentDetail=()=>{
+        FuncUpdateAppointment(SelectedAppointment.id, SelectedAppointment.appointmentDateTime,
+            SelectedAppointment.remark, SelectedAppointment.status).then((resp)=>{
+                window.alert(resp.message);
+             }).catch((exp)=>{
+                console.warn(exp);
+             })
+    }
+    const CancelAppointment=()=>{
+        UpdateAppStatus('Cancelled');
+        UpdateAppointmentDetail();
+    }
+    const GetAppointmentButton = () => {
+        if(user.Role == 'Patient'){
+            return (
+                <>
+                    <Button onClick={CancelAppointment} danger>Cancel Appointment</Button></>
+            )
+        }else{
+            return (
+                <>
+                    <Button type="primary" onClick={UpdateAppointmentDetail}>Update Appointment Information</Button>
+                    <Button type="primary" onClick={() => { setNewPrescriptionModal(true) }}>Add Prescription</Button></>
+            )
+        }
+        
     }
     return (
         <div>
@@ -240,26 +270,24 @@ function PatientDetails() {
                 SelectedAppointment != null &&
                 <Row style={{ marginTop: 20 }}>
                     <Descriptions title="Appointment Details"
-                        extra={<>
-                            <Button type="primary">Update Appointment Information</Button>
-                            <Button type="primary" onClick={() => { setNewPrescriptionModal(true) }}>Add Prescription</Button></>}>
+                        extra={GetAppointmentButton()}>
                         <Descriptions.Item label="Doctor In charge">{SelectedAppointment?.doctor?.firstName + " " + SelectedAppointment?.doctor?.lastName}</Descriptions.Item>
                         <Descriptions.Item label="Date Time">{SelectedAppointment?.appointmentDateTime.replace("T", " ")}</Descriptions.Item>
                         <Descriptions.Item label="Status">
                             <Select
                                 style={{ minWidth: 150 }}
-                                onChange={(val) => { UpdateAppStatus("DoctorID", val) }}
+                                onChange={(val) => { UpdateAppStatus(val) }}
                                 options={[
                                     {
-                                        value: 'Booked',
+                                        value: 'booked',
                                         label: 'Booked'
                                     },
                                     {
-                                        value: 'Cancelled',
+                                        value: 'cancelled',
                                         label: 'Cancelled'
                                     },
                                     {
-                                        value: 'Attended',
+                                        value: 'attended',
                                         label: 'Attended'
                                     }
                                 ]}
@@ -294,6 +322,7 @@ function PatientDetails() {
                         /></Descriptions.Item>
                     <Descriptions.Item label="Tag" span={3}>
                         <Select
+                            disabled={user.Role == "Patient"}
                             onChange={(val) => { UpdateSpecificColumn("Tag", val) }}
                             options={[
                                 { value: 'Red', label: GetTagWording('Red') },

@@ -2,113 +2,52 @@ import React, { useState, useEffect } from "react";
 import { Button, Checkbox, Form, Input, Typography, Divider, Row, Col, Card, Space, Modal, Tag } from 'antd';
 import { useNavigate } from "react-router-dom";
 import { CloseOutlined, InfoCircleOutlined } from '@ant-design/icons';
-import { FuncCreateUser, FuncRegisterDoctor, FuncGetDoctor } from '../functions/Users';
-
+import { FuncCreateUser, FuncRegisterDoctor, FuncGetDoctor, FuncRegisterPharmacist, FuncGetPharmacist } from '../functions/Users';
+import { store } from '../redux/store';
 const { Title } = Typography;
 
 function Admin() {
     let navigate = useNavigate();
+    const user = store.getState();
+
     const [showModel, setShowModel] = useState('');
     const [doctorList, setDoctorList] = useState([]);
     const [pharmacistList, setPharmacistList] = useState([]);
     const [NewDoctor, setNewDoctor] = useState({});
+    const [NewPharmacist , setNewPharmacist] = useState({});
 
     useEffect(() => {
-        //test for add doctorList
         GetDoctorList();
-        // var test_doctor_list = [
-        //     {
-        //         Id: 'test id',
-        //         name: 'Test Name',
-        //         profession: 'profession',
-        //         Onduty: true
-        //     },
-        //     {
-        //         Id: 'test id',
-        //         name: 'Test Name',
-        //         profession: 'profession',
-        //         Onduty: true
-        //     },
-        //     {
-        //         Id: 'test id',
-        //         name: 'Test Name',
-        //         profession: 'profession',
-        //         Onduty: false
-        //     },
-        //     {
-        //         Id: 'test id',
-        //         name: 'Test Name',
-        //         profession: 'profession',
-        //         Onduty: false
-        //     },
-        //     {
-        //         Id: 'test id',
-        //         name: 'Test Name',
-        //         profession: 'profession',
-        //         Onduty: true
-        //     },
-        //     {
-        //         Id: 'test id',
-        //         name: 'Test Name',
-        //         profession: 'profession',
-        //         Onduty: true
-        //     }
-        // ];
-        // setDoctorList(test_doctor_list);
-        //test for add pharmacist List
-        var test_pharmacist_list = [
-            {
-                Id: 'test id',
-                name: 'Test Name',
-                Onduty: true
-            },
-            {
-                Id: 'test id',
-                name: 'Test Name',
-                Onduty: false
-            },
-            {
-                Id: 'test id',
-                name: 'Test Name',
-                Onduty: true
-            },
-            {
-                Id: 'test id',
-                name: 'Test Name',
-                Onduty: true
-            },
-            {
-                Id: 'test id',
-                name: 'Test Name',
-                Onduty: true
-            },
-            {
-                Id: 'test id',
-                name: 'Test Name',
-                Onduty: false
-            },
-            {
-                Id: 'test id',
-                name: 'Test Name',
-                Onduty: true
-            },
-        ];
-        setPharmacistList(test_pharmacist_list);
+        GetPharmacistlist();
     }, []);
 
-    const GetDoctorList=()=>{
-        FuncGetDoctor().then((resp)=>{
+    const GetDoctorList = () => {
+        FuncGetDoctor().then((resp) => {
             console.log(resp);
             setDoctorList([...resp.doctorList]);
         })
     }
 
+    const GetPharmacistlist = ()=>{
+        FuncGetPharmacist().then((resp)=>{
+            console.log(resp);
+            setPharmacistList([...resp.pharmacistList]);
+        }).catch((exp)=>{
+            console.warn(exp);
+        })
+    }
     const SetDoctorVal = (obj, val) => {
         NewDoctor[obj] = val;
-        setNewDoctor({...NewDoctor});
+        setNewDoctor({ ...NewDoctor });
     }
+
+    const SetPharmacistVal = (obj , val)=>{
+        NewPharmacist[obj] = val;
+        setNewPharmacist({...NewPharmacist});
+    }
+
     const OnModelFinished = () => {
-        if(showModel === 'Doctor'){
+        if (showModel === 'Doctor') {
             CreateNewDoctor();
         }
         console.log("Close Model")
@@ -119,21 +58,36 @@ function Admin() {
     }
 
     const NavigateToPharmacy = (pharmacist_id) => {
-        navigate('/DoctorList', { state: { id: pharmacist_id } });
+        navigate('/PharmacistProfile', { state: { id: pharmacist_id } });
     }
 
     const CreateNewDoctor = () => {
         //calling to create new doctor 
-        FuncCreateUser(NewDoctor.UserName , NewDoctor.Password, NewDoctor.ConfirmPassword, NewDoctor.Email).then((resp)=>{
-            if(resp.success && resp.userId){
-                FuncRegisterDoctor(resp.userId , NewDoctor.FirstName , NewDoctor.LastName , 
-                    NewDoctor.Introduction, NewDoctor.Professional, NewDoctor.ContactNum, NewDoctor.Email).then((regis_resp)=>{
+        FuncCreateUser(NewDoctor.UserName, NewDoctor.Password, NewDoctor.ConfirmPassword, NewDoctor.Email).then((resp) => {
+            if (resp.success && resp.userId) {
+                FuncRegisterDoctor(resp.userId, NewDoctor.FirstName, NewDoctor.LastName,
+                    NewDoctor.Introduction, NewDoctor.Professional, NewDoctor.ContactNum, NewDoctor.Email).then((regis_resp) => {
                         window.alert(regis_resp.message);
                         setShowModel('');
                         setNewDoctor({});
                     });
             }
-        }).catch((exp)=>{
+        }).catch((exp) => {
+            console.warn(exp);
+        })
+    }
+
+    const RegisterNewPharmacist=()=>{
+        FuncCreateUser(NewPharmacist.UserName, NewPharmacist.Password, NewPharmacist.ConfirmPassword, NewPharmacist.Email).then((resp) => {
+            if (resp.success && resp.userId) {
+                FuncRegisterPharmacist(resp.userId, NewPharmacist.FirstName, NewPharmacist.LastName,
+                    NewPharmacist.Introduction).then((regis_resp) => {
+                        window.alert(regis_resp.message);
+                        setShowModel('');
+                        setNewPharmacist({});
+                    });
+            }
+        }).catch((exp) => {
             console.warn(exp);
         })
     }
@@ -142,17 +96,21 @@ function Admin() {
         <div style={{ width: '100%', height: '100%', padding: 20 }}>
             <Title level={3}>Administration</Title>
             <Divider orientation="left">Doctors</Divider>
-            <Row justify='start' align='top'>
-                <Button type="primary" style={{ alignSelf: 'flex-start' }} onClick={() => { setShowModel('Doctor') }}>New</Button>
-            </Row>
+            {
+                user.Role == "Admin" &&
+                <Row justify='start' align='top'>
+                    <Button type="primary" style={{ alignSelf: 'flex-start' }} onClick={() => { setShowModel('Doctor') }}>New</Button>
+                </Row>
+            }
+
             <Row justify='start' align='top' style={{ padding: 10 }} >
                 {
                     doctorList.map(x =>
-                        <Col xl={8} xs={16} xxl={8}>
+                        <Col xl={8} xs={16} xxl={8} key={x.id}>
                             <Card title={x.firstName + " " + x.lastName} extra={<Button type="link" icon={<InfoCircleOutlined />} onClick={() => { NavigateToDoctors(x.id) }} />} style={{ minWidth: 300, margin: 20 }}>
-                               <p><b>{x.profession}</b></p>
-                               <p>{x.introduction}</p>
-                               <p>{x.contactNum}</p>
+                                <p><b>{x.profession}</b></p>
+                                <p>{x.introduction}</p>
+                                <p>{x.contactNum}</p>
                             </Card>
                         </Col>
                     )
@@ -162,19 +120,20 @@ function Admin() {
 
 
             <Divider orientation="left">Pharmacist</Divider>
-            <Row justify='start' align='top'>
-                <Button type="primary" style={{ alignSelf: 'flex-start' }} onClick={() => { setShowModel('Pharmacist') }}>New</Button>
-            </Row>
+            {
+                user.Role == "Admin" &&
+                <Row justify='start' align='top'>
+                    <Button type="primary" style={{ alignSelf: 'flex-start' }} onClick={() => { setShowModel('Pharmacist') }}>New</Button>
+                </Row>
+            }
+
             <Row justify='start' align='top' style={{ padding: 10 }} >
                 {
                     pharmacistList.map(x =>
-                        <Col xl={8} xs={16} xxl={8}>
-                            <Card title={x.name} extra={<Button type="link" icon={<InfoCircleOutlined />} onClick={() => { NavigateToPharmacy(x.Id) }} />} style={{ width: 300, margin: 20 }}>
-
-                                <p>{x.profession}</p>
-                                <Tag color={x.Onduty ? 'green' : 'red'} key={x.Id}>
-                                    {x.Onduty ? 'On Duty' : 'Off Duty'}
-                                </Tag>
+                        <Col xl={8} xs={16} xxl={8} key={x.id}>
+                            <Card title={x.firstName + " " + x.lastName} extra={<Button type="link" icon={<InfoCircleOutlined />} onClick={() => { NavigateToPharmacy(x.id) }} />} style={{ width: 300, margin: 20 }}>
+                                <p><b>Introduction</b></p>
+                                <p>{x.introduction}</p>
                             </Card>
                         </Col>
                     )
@@ -263,7 +222,7 @@ function Admin() {
                                         <Input.TextArea value={NewDoctor?.Introduction} onChange={(val) => { SetDoctorVal("Introduction", val.target.value) }} />
                                     </Form.Item>
 
-                                   
+
                                 </Form>
                             }
                             {
@@ -279,7 +238,7 @@ function Admin() {
                                         name="username"
                                         rules={[{ required: true, message: 'Please input your username!' }]}
                                     >
-                                        <Input value={"Test"} />
+                                        <Input value={NewPharmacist?.UserName} onChange={(val) => { SetPharmacistVal("UserName", val.target.value) }} />
                                     </Form.Item>
 
                                     <Form.Item
@@ -287,7 +246,8 @@ function Admin() {
                                         name="password"
                                         rules={[{ required: true, message: 'Please input your password!' }]}
                                     >
-                                        <Input.Password value={"Test"} />
+                                        <Input value={NewPharmacist?.Password} onChange={(val) => { SetPharmacistVal("Password", val.target.value) }} />
+
                                     </Form.Item>
 
                                     <Form.Item
@@ -295,7 +255,17 @@ function Admin() {
                                         name="Confirmpassword"
                                         rules={[{ required: true, message: 'Re-enter Password' }]}
                                     >
-                                        <Input.Password value={"Test"} />
+                                                                                <Input value={NewPharmacist?.ConfirmPassword} onChange={(val) => { SetPharmacistVal("ConfirmPassword", val.target.value) }} />
+
+                                    </Form.Item>
+
+                                    <Form.Item
+                                        label="Email"
+                                        name="email"
+                                        rules={[{ required: true, message: 'Email Required' }]}
+                                    >
+                                        <Input value={NewPharmacist?.Email} onChange={(val) => { SetPharmacistVal("Email", val.target.value) }} />
+
                                     </Form.Item>
 
                                     <Form.Item
@@ -303,7 +273,8 @@ function Admin() {
                                         name="firstname"
                                         rules={[{ required: true, message: 'First Name Required' }]}
                                     >
-                                        <Input value={"Test"} />
+                                        <Input value={NewPharmacist?.FirstName} onChange={(val) => { SetPharmacistVal("FirstName", val.target.value) }} />
+
                                     </Form.Item>
 
                                     <Form.Item
@@ -311,12 +282,21 @@ function Admin() {
                                         name="lastname"
                                         rules={[{ required: true, message: 'Last Name Required' }]}
                                     >
-                                        <Input value={"Test"} />
+                                        <Input value={NewPharmacist?.LastName} onChange={(val) => { SetPharmacistVal("LastName", val.target.value) }} />
+                                    </Form.Item>
+
+                                    <Form.Item
+                                        label="Introduction"
+                                        name="introduction"
+                                        rules={[{ required: true, message: 'Introduction Required' }]}
+                                    >
+                                        <Input.TextArea value={NewPharmacist?.Introduction} onChange={(val) => { SetPharmacistVal("Introduction", val.target.value) }} />
+
                                     </Form.Item>
 
                                     <Form.Item wrapperCol={{ offset: 4, span: 16 }}>
-                                        <Button type="primary" htmlType="button">
-                                            Create
+                                        <Button type="primary" htmlType="button" onClick={RegisterNewPharmacist}>
+                                            Create New Pharmacist
                                         </Button>
                                     </Form.Item>
                                 </Form>

@@ -69,7 +69,7 @@ export const FuncNewAppointment=(AppointmentDateTime = "", isPatient = true, Pat
 }
 
 export const FuncUpdateAppointment=(AppointId = "", AppointmentDateTime = null, Remark = "", Status = "")=>{
-    const Url = BaseUrl + "Users/UpdateAppointment";
+    const Url = BaseUrl + "Appointment/UpdateAppointment";
     return new Promise((resolve, reject)=>{
         fetch(Url , {
             headers: {

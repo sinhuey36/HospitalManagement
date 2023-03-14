@@ -12,42 +12,47 @@ function Login() {
     const dispatch = useDispatch()
     let navigate = useNavigate();
     const onFinish = () => {
-        FuncLogin(userName , password).then((resp)=>{
+        FuncLogin(userName, password).then((resp) => {
             var loginInfo = {
-                UserName : userName,
-                FirstName : resp.user.firstName,
-                LastName : resp.user.lastName,
-                Role : resp.user.role,
-                RoleId : resp.user.id,
-                UserId : resp.user.userId
+                UserName: userName,
+                FirstName: resp.user.firstName,
+                LastName: resp.user.lastName,
+                Role: resp.user.role,
+                RoleId: resp.user.id,
+                UserId: resp.user.userId
             }
             dispatch(login(loginInfo));
             return {
-                role : resp.user.role ,
-                id : resp.user.id
+                role: resp.user.role,
+                id: resp.user.id
             }
-        }).then((val)=>{
+        }).then((val) => {
             console.log(val);
-            if(val.role == "Doctor"){
+            if (val.role == "Doctor") {
                 navigate('/DoctorProfile', { state: { id: val.id } });
-                return ;
-            }
-            if(val.role == "Patient"){
-                navigate('/PatientDetails', { state: { id: val.id } });
-                return ;
-            }
-            if(val.role == "Pharmacist"){
-                navigate('/PharmacistList');
-                return ;
-            }
-            if(val.role == "Admin"){
-                navigate('/Home');
                 return;
             }
-        }).catch((exp)=>{
+            if (val.role == "Patient") {
+                navigate('/PatientDetails', { state: { id: val.id } });
+                return;
+            }
+            if (val.role == "Pharmacist") {
+                navigate('/PharmacistList');
+                return;
+            }
+            if (val.role == "Admin") {
+                navigate('/');
+                return;
+            }
+        }).catch((exp) => {
             console.warn(exp);
         });
     };
+
+    const onRegister=()=>{
+        navigate('/Register');
+    }
+    
     return (
 
         <div style={{ width: '100%', height: '100%', alignContent: 'center', alignItems: 'center', padding: 50, justifyContent: 'center' }}>
@@ -80,13 +85,13 @@ function Login() {
                         <Form.Item name="remember" valuePropName="checked" wrapperCol={{ offset: 4, span: 16 }}>
                             <Checkbox>Remember me</Checkbox>
                         </Form.Item>
-
-                        <Form.Item wrapperCol={{ offset: 4, span: 16 }}>
-                            <Button type="primary" htmlType="button" onClick={onFinish}>
-                                Login
-                            </Button>
-                        </Form.Item>
                     </Form>
+                    <Button type="primary" htmlType="button" onClick={onRegister} style={{ margin: 20 }}>
+                        Register
+                    </Button>
+                    <Button type="primary" htmlType="button" onClick={onFinish} style={{ margin: 20 }}>
+                        Login
+                    </Button>
                 </Col>
             </Row>
         </div>

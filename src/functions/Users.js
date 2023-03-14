@@ -1,80 +1,80 @@
-import {BaseUrl} from './Base';
+import { BaseUrl } from './Base';
 
-export const FuncGetUser=()=>{
+export const FuncGetUser = () => {
     const Url = BaseUrl + "Users/getUsers";
-    return new Promise((resolve, reject)=>{
-        fetch(Url).then((resp)=>{
+    return new Promise((resolve, reject) => {
+        fetch(Url).then((resp) => {
             return resp.json();
-        }).then((resp)=>{
-            if(resp.success){
+        }).then((resp) => {
+            if (resp.success) {
                 resolve(resp);
-            }else{
+            } else {
                 window.alert(resp.message);
                 reject(resp);
             }
-        }).catch((exp)=>{
+        }).catch((exp) => {
             reject(exp);
         })
     })
 }
 
 
-export const FuncGetPatient=(value = "" , type = "name")=>{
+export const FuncGetPatient = (value = "", type = "name") => {
     let Url = BaseUrl + "Users/GetPatient";
 
-    if(value != ""){
+    if (value != "") {
         Url += "?";
-        Url += (type +"=" + value)
+        Url += (type + "=" + value)
     }
-    
-    return new Promise((resolve, reject)=>{
-        fetch(Url).then((resp)=>{
+
+    return new Promise((resolve, reject) => {
+        fetch(Url).then((resp) => {
             return resp.json();
-        }).then((resp)=>{
-            if(resp.success){
+        }).then((resp) => {
+            if (resp.success) {
                 resolve(resp);
-            }else{
+            } else {
                 window.alert(resp.message);
                 reject(resp);
             }
-        }).catch((exp)=>{
+        }).catch((exp) => {
             reject(exp);
         })
     })
 }
 
 
-export const FuncGetDoctor=(name = "", id="")=>{
+export const FuncGetDoctor = (name = "", id = "") => {
     let Url = BaseUrl + "Users/GetDoctor";
-    if(name != ""){
+    if (name != "") {
         Url += "?name=" + name
     }
-    if(name != "" && id != ""){
+    if (name != "" && id != "") {
         Url += "&id=" + id;
     }
-    if(name == "" && id != ""){
+    if (name == "" && id != "") {
         Url += "?id=" + id;
     }
-    return new Promise((resolve, reject)=>{
-        fetch(Url).then((resp)=>{
+    return new Promise((resolve, reject) => {
+        fetch(Url).then((resp) => {
             return resp.json();
-        }).then((resp)=>{
-            if(resp.success){
+        }).then((resp) => {
+            if (resp.success) {
                 resolve(resp);
-            }else{
+            } else {
                 window.alert(resp.message);
                 reject(resp);
             }
-        }).catch((exp)=>{
+        }).catch((exp) => {
             reject(exp);
         })
     })
 }
 
-export const FuncUpdatePatient=(patient)=>{
+export const FuncUpdatePatient = (patient) => {
     const Url = BaseUrl + "Users/UpdatePatient";
-    return new Promise((resolve, reject)=>{
-        fetch(Url , {
+    return new Promise((resolve, reject) => {
+        fetch(Url, {
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json'
@@ -83,46 +83,52 @@ export const FuncUpdatePatient=(patient)=>{
             body: JSON.stringify(
                 patient
             )
-        }).then((resp)=>{
+        }).then((resp) => {
             return resp.json();
-        }).then((resp)=>{
-            if(resp.success){
+        }).then((resp) => {
+            if (resp.success) {
                 resolve(resp);
-            }else{
+            } else {
                 window.alert(resp.message);
                 reject(resp);
             }
-        }).catch((exp)=>{
+        }).catch((exp) => {
             reject(exp);
         })
     })
 }
 
-export const FuncGetPharmacist=(name = "")=>{
-    const Url = BaseUrl + "Users/GetPharmacist";
-    if(name != ""){
+export const FuncGetPharmacist = (name = "", id = "") => {
+    var Url = BaseUrl + "Users/GetPharmacist";
+    if (name != "") {
         Url += "?name=" + name
     }
-    return new Promise((resolve, reject)=>{
-        fetch(Url).then((resp)=>{
+    if (name != "" && id != "") {
+        Url += "&id=" + id;
+    }
+    if (name == "" && id != "") {
+        Url += "?id=" + id;
+    }
+    return new Promise((resolve, reject) => {
+        fetch(Url).then((resp) => {
             return resp.json();
-        }).then((resp)=>{
-            if(resp.success){
+        }).then((resp) => {
+            if (resp.success) {
                 resolve(resp);
-            }else{
+            } else {
                 window.alert(resp.message);
                 reject(resp);
             }
-        }).catch((exp)=>{
+        }).catch((exp) => {
             reject(exp);
         })
     })
 }
 
-export const FuncCreateUser=(username, password, confirmPassword, Email)=>{
+export const FuncCreateUser = (username, password, confirmPassword, Email) => {
     const Url = BaseUrl + "Users/CreateUser";
-    return new Promise((resolve, reject)=>{
-        fetch(Url , {
+    return new Promise((resolve, reject) => {
+        fetch(Url, {
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json'
@@ -130,32 +136,32 @@ export const FuncCreateUser=(username, password, confirmPassword, Email)=>{
             method: "POST",
             body: JSON.stringify(
                 {
-                    UserName : username,
-                    Password : password,
-                    ConfirmPassword : confirmPassword,
-                    Email : Email
+                    UserName: username,
+                    Password: password,
+                    ConfirmPassword: confirmPassword,
+                    Email: Email
                 }
             )
-        }).then((resp)=>{
+        }).then((resp) => {
             return resp.json();
-        }).then((resp)=>{
-            if(resp.success){
+        }).then((resp) => {
+            if (resp.success) {
                 resolve(resp);
-            }else{
+            } else {
                 window.alert(resp.message);
                 reject(resp);
             }
-        }).catch((exp)=>{
+        }).catch((exp) => {
             reject(exp);
         })
     })
 }
 
 
-export const FuncRegisterPatient=(userId, firstName, lastName, nric, address, contactnum, tag, age)=>{
+export const FuncRegisterPatient = (userId, firstName, lastName, nric, address, contactnum, tag, age) => {
     const Url = BaseUrl + "Users/RegisterPatient";
-    return new Promise((resolve, reject)=>{
-        fetch(Url , {
+    return new Promise((resolve, reject) => {
+        fetch(Url, {
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json'
@@ -163,36 +169,36 @@ export const FuncRegisterPatient=(userId, firstName, lastName, nric, address, co
             method: "POST",
             body: JSON.stringify(
                 {
-                    UserId : userId,
-                    FirstName : firstName,
-                    LastName : lastName,
-                    NRIC : nric,
-                    Address : address,
-                    ContactNum : contactnum,
-                    Age : age,
-                    Tag : tag
+                    UserId: userId,
+                    FirstName: firstName,
+                    LastName: lastName,
+                    NRIC: nric,
+                    Address: address,
+                    ContactNum: contactnum,
+                    Age: age,
+                    Tag: tag
                 }
             )
-        }).then((resp)=>{
+        }).then((resp) => {
             return resp.json();
-        }).then((resp)=>{
-            if(resp.success){
+        }).then((resp) => {
+            if (resp.success) {
                 resolve(resp);
-            }else{
+            } else {
                 window.alert(resp.message);
                 reject(resp);
             }
-        }).catch((exp)=>{
+        }).catch((exp) => {
             reject(exp);
         })
     })
 }
 
 
-export const FuncRegisterDoctor=(userId, firstName, lastName, intro, prof, contactnum, email)=>{
+export const FuncRegisterDoctor = (userId, firstName, lastName, intro, prof, contactnum, email) => {
     const Url = BaseUrl + "Users/RegisterDoctor";
-    return new Promise((resolve, reject)=>{
-        fetch(Url , {
+    return new Promise((resolve, reject) => {
+        fetch(Url, {
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json'
@@ -200,34 +206,34 @@ export const FuncRegisterDoctor=(userId, firstName, lastName, intro, prof, conta
             method: "POST",
             body: JSON.stringify(
                 {
-                    UserId : userId,
-                    FirstName : firstName,
-                    LastName : lastName,
-                    Introduction : intro,
-                    Profession : prof,
-                    ContactNum : contactnum,
-                    Email : email
+                    UserId: userId,
+                    FirstName: firstName,
+                    LastName: lastName,
+                    Introduction: intro,
+                    Profession: prof,
+                    ContactNum: contactnum,
+                    Email: email
                 }
             )
-        }).then((resp)=>{
+        }).then((resp) => {
             return resp.json();
-        }).then((resp)=>{
-            if(resp.success){
+        }).then((resp) => {
+            if (resp.success) {
                 resolve(resp);
-            }else{
+            } else {
                 window.alert(resp.message);
                 reject(resp);
             }
-        }).catch((exp)=>{
+        }).catch((exp) => {
             reject(exp);
         })
     })
 }
 
-export const FuncRegisterPharmacist=(userId, firstName, lastName, intro)=>{
+export const FuncRegisterPharmacist = (userId, firstName, lastName, intro) => {
     const Url = BaseUrl + "Users/RegisterPharmacist";
-    return new Promise((resolve, reject)=>{
-        fetch(Url , {
+    return new Promise((resolve, reject) => {
+        fetch(Url, {
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json'
@@ -235,22 +241,22 @@ export const FuncRegisterPharmacist=(userId, firstName, lastName, intro)=>{
             method: "POST",
             body: JSON.stringify(
                 {
-                    UserId : userId,
-                    FirstName : firstName,
-                    LastName : lastName,
-                    Introduction : intro
+                    UserId: userId,
+                    FirstName: firstName,
+                    LastName: lastName,
+                    Introduction: intro
                 }
             )
-        }).then((resp)=>{
+        }).then((resp) => {
             return resp.json();
-        }).then((resp)=>{
-            if(resp.success){
+        }).then((resp) => {
+            if (resp.success) {
                 resolve(resp);
-            }else{
+            } else {
                 window.alert(resp.message);
                 reject(resp);
             }
-        }).catch((exp)=>{
+        }).catch((exp) => {
             reject(exp);
         })
     })

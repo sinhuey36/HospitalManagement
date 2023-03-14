@@ -5,12 +5,12 @@ import { useSelector, useDispatch } from 'react-redux'
 import { login, logout } from '../redux/reducer/UserReducer';
 import { UserOutlined } from '@ant-design/icons';
 import { useParams, useLocation, useNavigate } from 'react-router-dom';
-import {FuncGetDoctor} from '../functions/Users';
+import {FuncGetDoctor, FuncGetPharmacist} from '../functions/Users';
 import { store } from '../redux/store';
 
 const { Title, Text } = Typography;
 
-function DoctorProfile() {
+function PharmacistProfile() {
     const user = store.getState();
     const { state } = useLocation();
     const [profile, setProfile] = useState(null);
@@ -22,12 +22,12 @@ function DoctorProfile() {
     }, []);
 
     const GetProfile=(id)=>{
-        FuncGetDoctor("", id).then((resp)=>{
-            if(resp.doctorList.length != 1){
+        FuncGetPharmacist("", id).then((resp)=>{
+            if(resp.pharmacistList.length != 1){
                 window.alert("User Not found");
                 return;
             }else{
-                const doctor = resp.doctorList[0];
+                const doctor = resp.pharmacistList[0];
                 setProfile({...doctor});
             }
 
@@ -36,9 +36,6 @@ function DoctorProfile() {
             console.warn(exp);
         })
     }   
-    const ViewAppointment=(Id)=>{
-        navigate('/DoctorList', { state: { id: Id } });
-    }
     return (
         <div>
             <Title level={3}>Profile</Title>
@@ -46,16 +43,9 @@ function DoctorProfile() {
             <div>
                 <Avatar size={80} icon={<UserOutlined />} />
             </div>
-            <Descriptions bordered style={{ marginTop: '3%' }} extra={
-                user.Role != 'Patient' && 
-            <Button type="primary" onClick={()=>{ViewAppointment(profile.id)}}>View Appointments</Button>
-            }>
+            <Descriptions bordered style={{ marginTop: '3%' }}>
                 <Descriptions.Item label="First Name">{profile?.firstName}</Descriptions.Item>
                 <Descriptions.Item label="Last Name">{profile?.lastName}</Descriptions.Item>
-                <Descriptions.Item label="Profession">{profile?.profession}</Descriptions.Item>
-                <Descriptions.Item label="ContactNo"> 
-                <p>{profile?.contactNum}</p>
-                </Descriptions.Item>
                 <Descriptions.Item label="Email">{profile?.email}</Descriptions.Item>
                 <Descriptions.Item label="Date of Join">{profile?.createDateTime?.split("T")[0]}</Descriptions.Item>
                 <Descriptions.Item label="Introduction" span={3}>{profile?.introduction}</Descriptions.Item>
@@ -63,4 +53,4 @@ function DoctorProfile() {
         </div>
     )
 }
-export default DoctorProfile;
+export default PharmacistProfile;
