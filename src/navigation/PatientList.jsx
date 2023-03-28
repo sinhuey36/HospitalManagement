@@ -3,7 +3,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { Button, Checkbox, Form, Input, Typography, Divider, Timeline, Row, Col, Descriptions, Select, Space, Table, Tag } from 'antd';
 import { useNavigate } from "react-router-dom";
 import { FuncGetPatient } from '../functions/Users';
-import {GetTagWording} from '../functions/CommonFunc';
+import { GetTagWording } from '../functions/CommonFunc';
 
 const { Title, Text } = Typography;
 const { Option } = Select;
@@ -12,7 +12,10 @@ function PatientList() {
     const [value, setValue] = useState('');
     const [type, setType] = useState('name');
     const [PatientList, setPatientList] = useState([]);
-
+    useEffect(() => {
+        setValue('A');
+        Search();
+    }, []);
     const onCurrencyChange = (newType) => {
         setType(newType);
     };

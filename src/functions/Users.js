@@ -157,8 +157,33 @@ export const FuncCreateUser = (username, password, confirmPassword, Email) => {
     })
 }
 
-
-export const FuncRegisterPatient = (userId, firstName, lastName, nric, address, contactnum, tag, age) => {
+export const UpdateDoctor = (profile)=>{
+    const Url = BaseUrl + "Users/UpdateDoctor";
+    return new Promise((resolve, reject) => {
+        fetch(Url, {
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            method: "POST",
+            body: JSON.stringify(
+                profile
+            )
+        }).then((resp) => {
+            return resp.json();
+        }).then((resp) => {
+            if (resp.success) {
+                resolve(resp);
+            } else {
+                window.alert(resp.message);
+                reject(resp);
+            }
+        }).catch((exp) => {
+            reject(exp);
+        })
+    });
+}
+export const FuncRegisterPatient = (userId, firstName, lastName, nric, address, contactnum, tag, age, gender) => {
     const Url = BaseUrl + "Users/RegisterPatient";
     return new Promise((resolve, reject) => {
         fetch(Url, {
@@ -176,7 +201,8 @@ export const FuncRegisterPatient = (userId, firstName, lastName, nric, address, 
                     Address: address,
                     ContactNum: contactnum,
                     Age: age,
-                    Tag: tag
+                    Tag: tag,
+                    Gender: gender
                 }
             )
         }).then((resp) => {

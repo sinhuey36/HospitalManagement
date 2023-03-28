@@ -13,7 +13,8 @@ const { Title, Text } = Typography;
 function Register() {
     const { state } = useLocation();
     const [Profile, setProfile] = useState({
-        Tag : 'Blue'
+        Tag : 'Blue',
+        Gender : 'Male'
     });
     const [UpdateProfile, setUpdateProfile] = useState([]);
     const [NewAppointmentModal, setNewAppModal] = useState(false);
@@ -46,7 +47,7 @@ function Register() {
         FuncCreateUser(Profile.UserName , Profile.Password, Profile.ConfirmPassword, Profile.Email).then((resp)=>{
             if(resp.success && resp.userId){
                 FuncRegisterPatient(resp.userId , Profile.FirstName , Profile.LastName,
-                     Profile.NRIC, Profile.Address, Profile.ContactNum, Profile.Tag, Profile.Age).then((resp)=>{
+                     Profile.NRIC, Profile.Address, Profile.ContactNum, Profile.Tag, Profile.Age, Profile.Gender).then((resp)=>{
                         window.alert("Patient Created");
                      });
             }
@@ -59,34 +60,33 @@ function Register() {
             <Title level={3}>New User Registration</Title>
             <Divider></Divider>
             <Row>
-                <Col xs={24} xl={12} sm={24} style={{ border: '1px solid grey', alignContent: 'center', padding: 10 }}>
-                    <Descriptions title="Login Profile">
-                        <Descriptions.Item label="UserName" span={3}>
+                <Col xs={0} xl={4} sm={0}></Col>
+                <Col xs={24} xl={16} sm={24}>
+                    <Descriptions extra={<Button type="primary" onClick={SubmitNewPatient}>Register</Button>}>
+                        <Descriptions.Item labelStyle={{width:'15%'}} label="UserName" span={3}>
                             <Input value={Profile?.UserName} onChange={(val) => { UpdateSpecificColumn("UserName", val.target.value) }} />
                         </Descriptions.Item>
-                        <Descriptions.Item label="Password" span={3}>
+                        <Descriptions.Item labelStyle={{width:'15%'}} label="Password" span={3}>
                             <Input.Password value={Profile?.Password} onChange={(val) => { UpdateSpecificColumn("Password", val.target.value) }} />
                         </Descriptions.Item>
-                        <Descriptions.Item label="Confirm Password" span={3}>
+                        <Descriptions.Item labelStyle={{width:'15%'}} label="Confirm Password" span={3}>
                             <Input.Password value={Profile?.ConfirmPassword} onChange={(val) => { UpdateSpecificColumn("ConfirmPassword", val.target.value) }} />
                         </Descriptions.Item>
-                        <Descriptions.Item label="Email" span={3}>
+                        <Descriptions.Item labelStyle={{width:'15%'}} label="Email" span={3}>
                             <Input value={Profile?.Email} onChange={(val) => { UpdateSpecificColumn("Email", val.target.value) }} />
                         </Descriptions.Item>
                     </Descriptions>
-                </Col>
-                <Col xs={24} xl={12} sm={24} style={{ border: '1px solid grey', alignContent: 'center', padding: 10 }}>
-                    <Descriptions title="Profile" extra={<Button type="primary" onClick={SubmitNewPatient}>Register</Button>}>
-                        <Descriptions.Item label="First Name" span={3}>
+                    <Descriptions>
+                        <Descriptions.Item labelStyle={{width:'15%'}} label="First Name" span={3}>
                             <Input value={Profile?.FirstName} onChange={(val) => { UpdateSpecificColumn("FirstName", val.target.value) }} />
                         </Descriptions.Item>
-                        <Descriptions.Item label="Last Name" span={3}>
+                        <Descriptions.Item labelStyle={{width:'15%'}} label="Last Name" span={3}>
                             <Input value={Profile?.LastName} onChange={(val) => { UpdateSpecificColumn("LastName", val.target.value) }} />
                         </Descriptions.Item>
-                        <Descriptions.Item label="NRIC" span={3}>
+                        <Descriptions.Item labelStyle={{width:'15%'}} label="NRIC" span={3}>
                             <Input value={Profile?.NRIC} onChange={(val) => { UpdateSpecificColumn("NRIC", val.target.value) }} />
                         </Descriptions.Item>
-                        <Descriptions.Item label="Age" span={3}>
+                        <Descriptions.Item labelStyle={{width:'15%'}} label="Age" span={3}>
                             <Select
                                 onChange={(val) => { UpdateSpecificColumn("Age", val) }}
                                 options={GenerateAgeSelect()}
@@ -95,10 +95,10 @@ function Register() {
                                 defaultValue={10}
                             />
                         </Descriptions.Item>
-                        <Descriptions.Item label="Contact" span={3}>
+                        <Descriptions.Item labelStyle={{width:'15%'}} label="Contact" span={3}>
                             <Input value={Profile?.ContactNum} onChange={(val) => { UpdateSpecificColumn("ContactNum", val.target.value) }} />
                         </Descriptions.Item>
-                        <Descriptions.Item label="Tag" span={3}>
+                        <Descriptions.Item labelStyle={{width:'15%'}} label="Tag" span={3}>
                             <Select
                             disabled
                                 onChange={(val) => { UpdateSpecificColumn("Tag", val) }}
@@ -111,11 +111,23 @@ function Register() {
                             />
 
                         </Descriptions.Item>
-                        <Descriptions.Item label="Address" span={3}>
+                        <Descriptions.Item labelStyle={{width:'15%'}} label="Gender" span={3}>
+                            <Select
+                                onChange={(val) => { UpdateSpecificColumn("Gender", val) }}
+                                options={[
+                                    { value: 'Male', label: 'Male' },
+                                    { value: 'Female', label: 'Female' }
+                                ]}
+                                value={Profile?.Gender}
+                            />
+
+                        </Descriptions.Item>
+                        <Descriptions.Item labelStyle={{width:'15%'}} label="Address" span={3}>
                             <Input.TextArea value={Profile?.Address} onChange={(val) => { UpdateSpecificColumn("Address", val.target.value) }} />
                         </Descriptions.Item>
                     </Descriptions>
                 </Col>
+                <Col xs={0} xl={4} sm={0}></Col>
             </Row>
         </div>
     )
