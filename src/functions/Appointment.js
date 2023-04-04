@@ -68,6 +68,32 @@ export const FuncNewAppointment=(AppointmentDateTime = "", isPatient = true, Pat
     })
 }
 
+
+export const FuncNewNonPatientAppointment=(App)=>{
+    const Url = BaseUrl + "Appointment/NewNonPatientAppointment";
+    return new Promise((resolve, reject)=>{
+        fetch(Url , {
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            method: "POST",
+            body: JSON.stringify(App)
+        }).then((resp)=>{
+            return resp.json();
+        }).then((resp)=>{
+            if(resp.success){
+                resolve(resp);
+            }else{
+                window.alert(resp.message);
+                reject(resp);
+            }
+        }).catch((exp)=>{
+            reject(exp);
+        })
+    })
+}
+
 export const FuncUpdateAppointment=(AppointId = "", AppointmentDateTime = null, Remark = "", Status = "")=>{
     const Url = BaseUrl + "Appointment/UpdateAppointment";
     return new Promise((resolve, reject)=>{

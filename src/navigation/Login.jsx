@@ -86,6 +86,9 @@ function Login() {
                             <Checkbox>Remember me</Checkbox>
                         </Form.Item>
                     </Form>
+                    <Button type="primary" htmlType="button" onClick={()=>{navigate('/AnnoymousAppointment')}} style={{ margin: 20 }}>
+                        New Appointment
+                    </Button>
                     <Button type="primary" htmlType="button" onClick={onRegister} style={{ margin: 20 }}>
                         Register
                     </Button>

@@ -12,6 +12,7 @@ import DoctorProfile from './navigation/DoctorProfile';
 import NewPatient from './navigation/NewPatient';
 import Register from './navigation/Register';
 import PharmacistProfile from './navigation/PharmacistProfile';
+import AnnoymousAppointment from './navigation/AnnoymousAppointment';
 
 function App() {
   return (
@@ -30,6 +31,7 @@ function App() {
               <Route path='DoctorProfile' element={<NavigationHeader Content={<DoctorProfile/>}/>}/>
               <Route path='NewPatient' element={<NavigationHeader Content={<NewPatient/>}/>}/>
               <Route path='PharmacistProfile' element={<NavigationHeader Content={<PharmacistProfile/>}/>}/>
+              <Route path='AnnoymousAppointment' element={<AnnoymousAppointment/>}/>
             </Routes>
           </div>
         </BrowserRouter>

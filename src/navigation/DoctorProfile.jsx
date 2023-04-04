@@ -46,7 +46,6 @@ function DoctorProfile() {
                 setIsUpdating(false);
             }
         });
-        console.log(profile);
     }   
     return (
         <div>
